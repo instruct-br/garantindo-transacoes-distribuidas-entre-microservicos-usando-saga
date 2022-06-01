@@ -67,6 +67,6 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    with HTTPServer(("", 8001), Handler) as server:
+    with HTTPServer(("0.0.0.0", 8001), Handler) as server:
         print("Servico de passagens rodando na porta 8001")
         server.serve_forever()
