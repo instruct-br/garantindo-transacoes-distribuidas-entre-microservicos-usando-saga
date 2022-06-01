@@ -1,0 +1,38 @@
+services:
+  passagens:
+    container_name: passagens
+    build: 
+      context: .
+      target: passagens
+    networks:
+      - external
+      - internal
+    ports:
+      - "8001:8001"
+    stdin_open: true
+    tty: true
+  assentos:
+    container_name: assentos
+    build: 
+      context: .
+      target: assentos
+    networks:
+      - internal
+    stdin_open: true
+    tty: true
+  pagamentos:
+    container_name: pagamentos
+    build: 
+      context: .
+      target: pagamentos
+    networks:
+      - external
+      - internal
+    stdin_open: true
+    tty: true
+
+networks:
+  external:
+    name: external
+  internal:
+    name: internal
