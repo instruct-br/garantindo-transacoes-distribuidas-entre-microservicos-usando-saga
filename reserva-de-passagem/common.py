@@ -126,7 +126,7 @@ class SolicitadorDeAssentosDeMentira:
         time.sleep(2)
 
         # cria uma conexao com localhost na porta 8002
-        connection = HTTPConnection("localhost", 8002)
+        connection = HTTPConnection("assentos", 8002)
 
         # seta o cabecalho para json
         headers = {"Content-Type": "application/json"}
@@ -151,7 +151,7 @@ class SolicitadorDeAssentosDeMentira:
 
     def solicita_reserva_com(self, referencia_da_passagem):
         # abre uma conexao com localhost na porta 8002
-        connection = HTTPConnection("localhost", 8002)
+        connection = HTTPConnection("assentos", 8002)
         # seta o cabecalho para json
         headers = {"Content-Type": "application/json"}
 

@@ -65,7 +65,7 @@ class SolicitadorDePassagemDeMentira:
         self.handler = handler
 
     def solicita_o_cancelamento_da_passagem_com(self, referencia_da_passagem):
-        connection = HTTPConnection("localhost", 8001)
+        connection = HTTPConnection("passagens", 8001)
         headers = {"Content-Type": "application/json"}
         data = json.dumps(referencia_da_passagem)
         connection.request("POST", "/passagens/cancela", data, headers)

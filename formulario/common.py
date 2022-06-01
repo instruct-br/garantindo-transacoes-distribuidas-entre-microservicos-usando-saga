@@ -17,7 +17,7 @@ def escolhe_um_destino():
 
 
 def solicita_reserva_de_passagem_para(destino):
-    connection = HTTPConnection("localhost", 8001)
+    connection = HTTPConnection("passagens", 8001)
     headers = {"Content-Type": "application/json"}
     data = json.dumps({"destino": destino})
     connection.request("POST", "/passagens", data, headers)
@@ -43,7 +43,7 @@ def solicita_pagamento(referencia_da_passagem):
     if status_da_passagem == "reservada":
         pagamento = input("Digite o valor do pagamento: ").strip()
 
-        connection = HTTPConnection("localhost", 8003)
+        connection = HTTPConnection("pagamentos", 8003)
         headers = {"Content-Type": "application/json"}
         referencia_da_passagem.update(
             {
