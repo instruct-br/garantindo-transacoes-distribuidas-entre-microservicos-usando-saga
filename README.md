@@ -1,169 +1,53 @@
 # Direto ao ponto
 
 ### Passo a Passo para executar os servicos
-### Observacao: Os comandos abaixo devem ser executados no terminal.
+> Observacao: Os comandos abaixo devem ser executados no terminal.
 
-1 - acesse o pacote reserva-de-assento e digite:
+1 - na raiz do projeto execute o comando:
 ```bash
-python main.py
-```
-confira o resultado:
-```bash
-Servico de assentos rodando na porta 8002
+docker-compose up --detach
 ```
 
-2 - accesse o pacote reserva-de-passagem e digite:
+2 - confira se os containers estao executando
 ```bash
-python main.py
-```
-confira o resultado:
-```bash
-Servico de passagens rodando na porta 8001
+docker-compose ps
 ```
 
-3 - accesse o pacote formula e digite:
+3 - o resultado deve ser parecido com esse
 ```bash
-python main.py
+NAME                COMMAND                  SERVICE             STATUS              PORTS
+assentos            "python assentos/mai…"   assentos            running             8002/tcp
+pagamentos          "python pagamentos/m…"   pagamentos          running             8003/tcp
+passagens           "python passagens/ma…"   passagens           running             8001/tcp
 ```
 
-confira o resultado:
+4 - acesse o pacote formulario e digite:
 ```bash
-
-    Servico ingenuo e extremamente limitado de reserva de passagem
-    
-Para onde voce quer ir?
-
+docker image build -t formulario .
 ```
 
-# Vamos brincar
+5 - execute o comando abaixo para subir o container do formulario:
+```bash
+docker container run --rm -it --network external formulario 
+```
 
-1 - escolha um destino
+6 - acesse os logs dos containers, por exemplo o de passagens
+```bash
+docker container logs -f passagens
+```
 
+> se voce escolheu algun destino, os logs do servico de passagens de estar parecido com isso aqui
 ```bash
 
     Servico ingenuo e extremamente limitado de reserva de passagem
-    
-Para onde voce quer ir? Lisboa
+        
+Para onde voce quer ir? casa
 
-```
-2 - aguarde alguns instantes, depois confira o resultado dos logs em cada um dos terminais.
+{'id_da_passagem': '127', 'status_da_passagem': 'reservada'}
 
-# Vamos conferir os logs de um fluxo normal
+Digite o valor do pagamento: 3.75
 
-1 - Resultado do servico de formulario
-```bash
-    Servico ingenuo e extremamente limitado de reserva de passagem
-    
-Para onde voce quer ir? Lisboa
-
-{'destino': 'Lisboa', 'passagem': {'numero': '16996', 'valor': '3.75', 'status': 'reservada'}, 'assento': {'numero': 5, 'status': 'reservado'}}
-
-Para onde voce quer ir?
-```
-
-2 - Resultado do servico de reserva-de-passagem
-
-```bash
-127.0.0.1 - - [16/May/2022 11:48:49] "POST /passagens HTTP/1.1" 200 -
-Um momento, estamos processando a sua requisicao.
-
-{'passagem': {'numero': '16996', 'valor': '3.75', 'status': 'pendente'}}
-
-Reserva de passagem pendente aguardando confirmacao de assento.
-
-Requisitando reserva de assento
-
-Requisicao realizado com sucesso.
-
-Iniciando o fluxo de resposta Normal
-
-Atualizando o status da passagem para reservada no banco de dados
-
-{'destino': 'Lisboa', 'passagem': {'numero': '16996', 'valor': '3.75', 'status': 'reservada'}}
-
-Status atualizado com sucesso.
-
-Atualizando o status da passagem para reservada no response
-
-{'destino': 'Lisboa', 'passagem': {'numero': '16996', 'valor': '3.75', 'status': 'reservada'}, 'assento': {'numero': 5, 'status': 'reservado'}}
-
-Status atualizado com sucesso.
-
-Finalizando o fluxo de resposta Normal
+{'id_do_pagamento': '5822', 'status_do_pagamento': 'pago'}
 
 ```
 
-3 - Resultado do servico de reserva-de-assento
-```bash
-127.0.0.1 - - [16/May/2022 11:48:55] "POST /assentos HTTP/1.1" 200 -
-Um momento, estamos processando a sua requisicao.
-
-Iniciando fluxo de resposta normal
-
-Atualizando o status do assento para reservado no banco de dados
-
-{'destino': 'Lisboa', 'passagem': {'numero': '16996', 'valor': '3.75', 'status': 'pendente'}, 'assento': {'numero': 5, 'status': 'reservado'}}
-
-Assento reservado com sucesso.
-
-Finalizando fluxo de resposta normal
-```
-
-# Vamos conferir os logs de um fluxo onde acontece uma operacao de compensacao.
-
-1 - Resultado do servico de formulario
-```bash
-    Servico ingenuo e extremamente limitado de reserva de passagem
-    
-Para onde voce quer ir? madri
-
-{'destino': 'madri', 'passagem': {'numero': '37581', 'valor': '3.75', 'status': 'cancelada'}, 'assento': {'numero': 0, 'status': 'cancelado'}}
-
-Para onde voce quer ir? 
-```
-
-2 - Resultado do servico de reserva-de-passagem
-```bash
-127.0.0.1 - - [16/May/2022 11:53:24] "POST /passagens HTTP/1.1" 200 -
-Um momento, estamos processando a sua requisicao.
-
-{'passagem': {'numero': '37581', 'valor': '3.75', 'status': 'pendente'}}
-
-Reserva de passagem pendente aguardando confirmacao de assento.
-
-Requisitando reserva de assento
-
-Requisicao realizado com sucesso.
-
-Inicializando o fluxo de resposta de compensacao
-
-Atualizando o status da passagem para cancelada no banco de dados
-
-{'destino': 'madri', 'passagem': {'numero': '37581', 'valor': '3.75', 'status': 'cancelada'}}
-
-Status atualizado com sucesso.
-
-Atualizando o status da passagem para cancelada no response
-
-{'destino': 'madri', 'passagem': {'numero': '37581', 'valor': '3.75', 'status': 'cancelada'}, 'assento': {'numero': 0, 'status': 'cancelado'}}
-
-Status atualizado com sucesso.
-
-Finalizando o fluxo de resposta de compensacao
-```
-
-3 - Resultado do servico de reserva-de-assento
-```bash
-127.0.0.1 - - [16/May/2022 11:53:30] "POST /assentos HTTP/1.1" 200 -
-Um momento, estamos processando a sua requisicao.
-
-Iniciando fluxo de resposta de compensacao
-
-Atualizando o status do assento para cancelado no banco de dados
-
-{'destino': 'madri', 'passagem': {'numero': '37581', 'valor': '3.75', 'status': 'pendente'}, 'assento': {'numero': 0, 'status': 'cancelado'}}
-
-Desculpa! nao foi possivel reservar um assento
-
-Finalizando fluxo de resposta de compensacao
-```
